@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人生の季節を数える｜ルネーションナンバー計算</title>
+<style>
+  :root{
+    --bg:#faf7f2; --ink:#3b3229; --sub:#7a6c5d; --line:#e3d9c9;
+    --accent:#a8724a; --card:#fffdfa; --gold:#c9a227;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:24px 16px 64px; background:var(--bg); color:var(--ink);
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif; line-height:1.9;
+  }
+  .wrap{max-width:640px; margin:0 auto}
+  h1{font-size:1.35rem; letter-spacing:.04em; margin:0 0 4px; font-weight:600}
+  .lead{color:var(--sub); font-size:.9rem; margin:0 0 28px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:20px; margin-bottom:20px}
+  label{display:block; font-size:.85rem; color:var(--sub); margin-bottom:6px}
+  .row{display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap}
+  .row>div{flex:1 1 90px}
+  input,select{
+    width:100%; padding:10px 8px; font-size:1rem; border:1px solid var(--line);
+    border-radius:6px; background:#fff; color:var(--ink); font-family:inherit;
+  }
+  button{
+    width:100%; margin-top:16px; padding:13px; font-size:1rem; font-family:inherit;
+    background:var(--accent); color:#fff; border:0; border-radius:6px; cursor:pointer; letter-spacing:.08em;
+  }
+  button:hover{opacity:.9}
+  .err{color:#b3413a; font-size:.85rem; margin-top:10px}
+  .big{font-size:1.9rem; color:var(--accent); font-weight:600; letter-spacing:.02em}
+  .kv{display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px dotted var(--line)}
+  .kv:last-child{border-bottom:0}
+  .kv span:first-child{color:var(--sub); font-size:.85rem; white-space:nowrap}
+  .kv span:last-child{text-align:right; font-weight:600}
+  .plant{color:var(--accent); font-size:.95rem}
+  h2{font-size:1rem; margin:28px 0 10px; padding-left:10px; border-left:3px solid var(--gold); font-weight:600}
+  table{width:100%; border-collapse:collapse; font-size:.85rem}
+  th,td{padding:7px 6px; border-bottom:1px solid var(--line); text-align:left}
+  th{color:var(--sub); font-weight:400; font-size:.78rem}
+  tr.now{background:#f6efe4}
+  tr.now td{font-weight:600}
+  td.num{text-align:right; color:var(--sub); width:3.2em}
+  .note{font-size:.78rem; color:var(--sub); line-height:1.8; margin-top:24px}
+  .hidden{display:none}
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#211d19; --ink:#ece4d8; --sub:#a2968a; --line:#3d362e; --card:#2a251f; --accent:#d9a077}
+    input,select{background:#1a1713; color:var(--ink)}
+    tr.now{background:#332c23}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>人生の季節を数える</h1>
+  <p class="lead">生年月日を入れると、ルネーションナンバーと、いま自分がどの季節にいるかが出ます。出生時刻はいりません。</p>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <label for="y">生まれた年</label>
+        <input id="y" type="number" inputmode="numeric" placeholder="例 1970" min="1920" max="2045">
+      </div>
+      <div>
+        <label for="m">月</label>
+        <input id="m" type="number" inputmode="numeric" placeholder="例 5" min="1" max="12">
+      </div>
+      <div>
+        <label for="d">日</label>
+        <input id="d" type="number" inputmode="numeric" placeholder="例 20" min="1" max="31">
+      </div>
+    </div>
+    <button id="go">数えてみる</button>
+    <div id="err" class="err"></div>
+  </div>
+
+  <div id="out" class="hidden">
+
+    <div class="card">
+      <div class="kv"><span>直前の新月</span><span id="r-nm"></span></div>
+      <div class="kv"><span>ルネーションナンバー</span><span class="big" id="r-num"></span></div>
+      <div class="kv"><span>生まれたときの季節</span><span id="r-birth"></span></div>
+    </div>
+
+    <h2>いま、どの季節にいますか</h2>
+    <div class="card">
+      <div class="kv"><span>いまの季節</span><span class="big" id="r-now"></span></div>
+      <div class="kv"><span></span><span class="plant" id="r-plant"></span></div>
+      <div class="kv"><span>この季節ですること</span><span id="r-doing"></span></div>
+      <div class="kv"><span>次の季節に移るのは</span><span id="r-next"></span></div>
+    </div>
+
+    <h2>これまでと、これから</h2>
+    <table>
+      <thead><tr><th class="num">歳</th><th>西暦</th><th>月相</th><th>たとえると</th></tr></thead>
+      <tbody id="r-table"></tbody>
+    </table>
+
+    <p class="note">
+      ※ 満ちて欠けてをひとめぐりするのに、月はおよそ30日。その1日を1年に置きかえると、およそ30年でひとめぐりする満ち欠けになります。だいたい3〜4年ごとに季節が変わり、30年たつと生まれたときの数字に戻ります。<br>
+      ※ この数え方は、鏡リュウジさん『ルネーション占星術』の「プログレス・ルネーション」をもとにしています。季節ごとの過ごし方は、この本にくわしく書かれています。<br>
+      ※ 新月の日付は Swiss Ephemeris で計算した1920〜2045年の実データを使っています。誕生日が新月の当日なら「0」です。<br>
+      ※ 年齢は誕生日を迎えたあとの満年齢で数えます。
+    </p>
+  </div>
+</div>
+
+<script>
+// 新月の日付表（JST・1920-2045）※pyswissephで算出・2026-08-05
+// 1920-01-01 からの日数を差分で保持。復元は累積和。
+const NM_BASE_Y=1920, NM_BASE_M=1, NM_BASE_D=1;
+const NM_DELTA=[-10,30,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,29,30,30,30,29,30,30,29,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,30,29,29,30,30,29,30,29,30,30,29,30,29,30,29,29,30,29,30,30,29,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,29,30,30,30,29,30,30,29,29,30,29,29,30,29,30,30,29,30,30,30,29,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,29,30,30,30,29,30,29,29,30,29,29,30,29,30,30,30,29,30,30,29,29,30,29,29,30,29,30,30,29,30,30,30,29,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,29,30,30,29,30,30,29,29,30,29,29,30,29,30,30,30,29,30,30,29,29,30,29,29,30,29,30,30,29,30,30,30,29,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,29,30,30,29,30,30,29,30,30,29,29,30,29,29,30,29,30,30,29,30,30,30,29,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,29,30,30,30,29,30,30,29,30,29,29,30,29,29,30,30,29,30,30,29,30,30,29,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,29,30,30,29,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,29,30,30,30,29,30,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,29,30,30,30,29,30,29,30,29,30,29,30,29,29,30,30,29,30,30,29,30,29,30,29,30,29,29,30,30,29,30,29,30,30,29,30,29,30,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,29,30,30,30,29,30,30,29,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,30,29,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,29,30,30,30,29,30,30,29,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,29,30,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,29,30,30,30,29,30,30,29,29,30,29,29,30,29,30,30,29,30,30,30,29,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,30,29,30,30,29,29,30,29,30,29,30,29,30,29,30,30,29,30,30,29,29,30,29,29,30,29,30,30,30,29,30,30,29,29,30,29,29,30,29,30,30,29,30,30,30,29,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,29,30,30,30,29,30,29,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,29,30,29,30,30,30,29,30,29,30,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,29,30,30,30,29,30,30,29,30,29,29,30,29,29,30,30,29,30,30,29,30,30,29,29,30,29,29,30,30,29,30,29,30,30,29,30,29,30,29,30,29,30,29,30,29,30,29,30,30,29,30,29,30,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,30,29,30,30,30,29,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,29,30,30,30,29,30,29,30,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,30,29,29,30,29,30,30,29,30,30,29,30,29,30,29,29,30,29,30,29,30,30,29,30,30,29,30,29,29,30,29,29,30,30,29,30,30,30,29,30,29,29,30,29,29,30,29,30,30,30,30,29,30,29,29,30,29,29,30,29,30];
+</script>
+<script>
+// ── 新月の日付表を復元（1920-01-01 起点の通日）
+const NM = (() => {
+  const out = []; let acc = 0;
+  for (const d of NM_DELTA) { acc += d; out.push(acc); }
+  return out;
+})();
+const BASE = Date.UTC(NM_BASE_Y, NM_BASE_M - 1, NM_BASE_D);
+const dayNo = (y, m, d) => Math.round((Date.UTC(y, m - 1, d) - BASE) / 86400000);
+const fromDayNo = n => new Date(BASE + n * 86400000);
+
+// ── 8つの季節（説明は自分の言葉・出典の解説文は使わない）
+const PHASES = [
+  {lo:0,  hi:3,  name:'ニュームーン期',            plant:'種が、土の中にいる',   doing:'新しい30年が始まる。まだ表には何も出ていない'},
+  {lo:4,  hi:6,  name:'クレセントムーン期',        plant:'芽が出て、根を張る',   doing:'不安と一緒に学びながら、土台をつくる'},
+  {lo:7,  hi:10, name:'ファーストクオーター期',    plant:'茎が伸びて、葉を広げる', doing:'試されながらも、動いて広げていく'},
+  {lo:11, hi:14, name:'ギバウスムーン期',          plant:'つぼみが、ふくらむ',   doing:'仕上げに向かって、形にしていく'},
+  {lo:15, hi:18, name:'フルムーン期',              plant:'花が、咲く',           doing:'手にしたものが満ちて、それを味わう'},
+  {lo:19, hi:22, name:'ディセミネイティングムーン期',plant:'実がなって、種がこぼれる', doing:'受け取ったものを、まわりに渡していく'},
+  {lo:23, hi:25, name:'サードクオーター期',        plant:'葉の養分を、根へ戻す', doing:'人のために、自分の責任を引き受ける'},
+  {lo:26, hi:29, name:'バルサミックムーン期',      plant:'枯れ葉が、土に還る',   doing:'いらないものを片づけて、身のまわりを整える'}
+];
+const phaseOf = n => PHASES.find(p => n >= p.lo && n <= p.hi);
+
+// ── ルネーションナンバー＝直前の新月の日を0として誕生日まで数えた日数
+function lunationNumber(y, m, d) {
+  const t = dayNo(y, m, d);
+  let prev = null;
+  for (const nm of NM) { if (nm <= t) prev = nm; else break; }
+  if (prev === null) return null;
+  return { num: t - prev, newMoon: fromDayNo(prev) };
+}
+
+// ── 満年齢（今日基準）
+function ageNow(y, m, d) {
+  const now = new Date();
+  let a = now.getFullYear() - y;
+  const md = (now.getMonth() + 1) * 100 + now.getDate();
+  if (md < m * 100 + d) a--;
+  return a;
+}
+
+const $ = id => document.getElementById(id);
+const fmt = dt => `${dt.getUTCFullYear()}年${dt.getUTCMonth() + 1}月${dt.getUTCDate()}日`;
+
+$('go').addEventListener('click', () => {
+  $('err').textContent = '';
+  const y = +$('y').value, m = +$('m').value, d = +$('d').value;
+  if (!y || !m || !d) { $('err').textContent = '生年月日をすべて入れてください。'; return; }
+  if (y < 1920 || y > 2045) { $('err').textContent = '1920年〜2045年で入れてください。'; return; }
+  const chk = new Date(Date.UTC(y, m - 1, d));
+  if (chk.getUTCFullYear() !== y || chk.getUTCMonth() !== m - 1 || chk.getUTCDate() !== d) {
+    $('err').textContent = 'その日付は存在しません。'; return;
+  }
+
+  const r = lunationNumber(y, m, d);
+  if (!r) { $('err').textContent = '計算できませんでした。'; return; }
+
+  const age = ageNow(y, m, d);
+  const nowNum = (r.num + age) % 30;
+  const birthPh = phaseOf(r.num), nowPh = phaseOf(nowNum);
+
+  $('r-nm').textContent    = fmt(r.newMoon);
+  $('r-num').textContent   = r.num;
+  $('r-birth').textContent = birthPh.name;
+  $('r-now').textContent   = nowPh.name;
+  $('r-plant').textContent = nowPh.plant;
+  $('r-doing').textContent = nowPh.doing;
+
+  // 次の季節に移るまで
+  let k = 1;
+  while (phaseOf((r.num + age + k) % 30).name === nowPh.name) k++;
+  $('r-next').textContent = `${k}年後（${y + age + k}年ごろ）`;
+
+  // 一覧（0歳〜89歳を季節のまとまりで）
+  const tb = $('r-table'); tb.innerHTML = '';
+  let a = 0;
+  while (a <= 89) {
+    const ph = phaseOf((r.num + a) % 30);
+    let e = a;
+    while (e + 1 <= 89 && phaseOf((r.num + e + 1) % 30).name === ph.name) e++;
+    const tr = document.createElement('tr');
+    if (age >= a && age <= e) tr.className = 'now';
+    tr.innerHTML =
+      `<td class="num">${a}〜${e}</td>` +
+      `<td>${y + a}〜${y + e}</td>` +
+      `<td>${ph.name.replace('期', '')}</td>` +
+      `<td>${ph.plant}</td>`;
+    tb.appendChild(tr);
+    a = e + 1;
+  }
+
+  $('out').classList.remove('hidden');
+  $('out').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// Enterでも実行
+['y','m','d'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') $('go').click(); }));
+</script>
+</body>
+</html>
