@@ -36,7 +36,7 @@
   .kv:last-child{border-bottom:0}
   .kv span:first-child{color:var(--sub); font-size:.85rem; white-space:nowrap}
   .kv span:last-child{text-align:right; font-weight:600}
-  .plant{color:var(--accent); font-size:.95rem}
+  .moon{color:var(--accent); font-size:.95rem}
   h2{font-size:1rem; margin:28px 0 10px; padding-left:10px; border-left:3px solid var(--gold); font-weight:600}
   table{width:100%; border-collapse:collapse; font-size:.85rem}
   th,td{padding:7px 6px; border-bottom:1px solid var(--line); text-align:left}
@@ -89,14 +89,14 @@
     <h2>いま、どの季節にいますか</h2>
     <div class="card">
       <div class="kv"><span>いまの季節</span><span class="big" id="r-now"></span></div>
-      <div class="kv"><span></span><span class="plant" id="r-plant"></span></div>
-      <div class="kv"><span>この季節ですること</span><span id="r-doing"></span></div>
+      <div class="kv"><span></span><span class="moon" id="r-moon"></span></div>
+      <div class="kv"><span>この季節は</span><span id="r-doing"></span></div>
       <div class="kv"><span>次の季節に移るのは</span><span id="r-next"></span></div>
     </div>
 
     <h2>これまでと、これから</h2>
     <table>
-      <thead><tr><th class="num">歳</th><th>西暦</th><th>月相</th><th>たとえると</th></tr></thead>
+      <thead><tr><th class="num">歳</th><th>西暦</th><th>月相</th><th>月の形</th></tr></thead>
       <tbody id="r-table"></tbody>
     </table>
 
@@ -126,16 +126,17 @@ const BASE = Date.UTC(NM_BASE_Y, NM_BASE_M - 1, NM_BASE_D);
 const dayNo = (y, m, d) => Math.round((Date.UTC(y, m - 1, d) - BASE) / 86400000);
 const fromDayNo = n => new Date(BASE + n * 86400000);
 
-// ── 8つの季節（説明は自分の言葉・出典の解説文は使わない）
+// ── 8つの季節（読みは太陽と月のアスペクトから筆者が立てたもの・出典の解説文は使わない）
+// ★本文は 2026-09-02 公開の記事「30年でひとめぐり。いま、あなたはどのあたりですか」の確定稿とそろえてある（2026-08-31）
 const PHASES = [
-  {lo:0,  hi:3,  name:'ニュームーン期',            plant:'種が、土の中にいる',   doing:'新しい30年が始まる。まだ表には何も出ていない'},
-  {lo:4,  hi:6,  name:'クレセントムーン期',        plant:'芽が出て、根を張る',   doing:'不安と一緒に学びながら、土台をつくる'},
-  {lo:7,  hi:10, name:'ファーストクオーター期',    plant:'茎が伸びて、葉を広げる', doing:'試されながらも、動いて広げていく'},
-  {lo:11, hi:14, name:'ギバウスムーン期',          plant:'つぼみが、ふくらむ',   doing:'仕上げに向かって、形にしていく'},
-  {lo:15, hi:18, name:'フルムーン期',              plant:'花が、咲く',           doing:'手にしたものが満ちて、それを味わう'},
-  {lo:19, hi:22, name:'ディセミネイティングムーン期',plant:'実がなって、種がこぼれる', doing:'受け取ったものを、まわりに渡していく'},
-  {lo:23, hi:25, name:'サードクオーター期',        plant:'葉の養分を、根へ戻す', doing:'人のために、自分の責任を引き受ける'},
-  {lo:26, hi:29, name:'バルサミックムーン期',      plant:'枯れ葉が、土に還る',   doing:'いらないものを片づけて、身のまわりを整える'}
+  {lo:0,  hi:3,  name:'ニュームーン期',            moon:'太陽と月が重なる', doing:'気持ちと意志がぴったり重なっていて、迷いなく動ける時期。新しいことを始める人も多い季節です。自分の気持ちに素直に、挑戦を。'},
+  {lo:4,  hi:6,  name:'クレセントムーン期',        moon:'三日月（45度・行き）', doing:'やりたいことに向かって動いていく時期。迷いや焦りも出ますが、自信がそろうのを待たなくても動けます。手応えが返ってくるまでには間がありますが、大切な学びの時期です。'},
+  {lo:7,  hi:10, name:'ファーストクオーター期',    moon:'上弦の月（90度・行き）', doing:'太陽と月がスクエア。葛藤も起きますが、力を使うぶん、動くほど道が広がります。高いところを目指して前に出る時期。挑んだことが、少しずつ形になっていきます。'},
+  {lo:11, hi:14, name:'ギバウスムーン期',          moon:'十三夜月（135度・行き）', doing:'最後の調整に入る時期。まわりを見ながら、状況に合わせていきます。ゴールが見えるぶん焦りも出やすいところですが、急がなくても、着実にやれば届きます。'},
+  {lo:15, hi:18, name:'フルムーン期',              moon:'太陽と月が向かい合う', doing:'30年でいちばん満ちるところ。積み上げてきたものが、そのまま成果になります。充実するぶん、勢いも自信もつきます。一歩引いて見ると、受け取ってきたものもよく見えます。'},
+  {lo:19, hi:22, name:'ディセミネイティングムーン期',moon:'種まきの月（135度・帰り）', doing:'速さがゆるんで、まわりが見えてくる時期。受け取ってきたものを外へ出していきます。人に伝えることで、自分が何を身につけたのかも見えてきます。'},
+  {lo:23, hi:25, name:'サードクオーター期',        moon:'下弦の月（90度・帰り）', doing:'必要なものと、そうでないものを振り分ける時期。振り返るなかで落ち込むようなことも出てきますが、それは次へ進むための整理です。'},
+  {lo:26, hi:29, name:'バルサミックムーン期',      moon:'鎮静の月（45度・帰り）', doing:'内側へ向かう時期。手放して、支度をととのえます。自分にとって大切なものは何か。ここで見えたものが、次のめぐりの始まりになります。'}
 ];
 const phaseOf = n => PHASES.find(p => n >= p.lo && n <= p.hi);
 
@@ -181,7 +182,7 @@ $('go').addEventListener('click', () => {
   $('r-num').textContent   = r.num;
   $('r-birth').textContent = birthPh.name;
   $('r-now').textContent   = nowPh.name;
-  $('r-plant').textContent = nowPh.plant;
+  $('r-moon').textContent  = nowPh.moon;
   $('r-doing').textContent = nowPh.doing;
 
   // 次の季節に移るまで
@@ -202,7 +203,7 @@ $('go').addEventListener('click', () => {
       `<td class="num">${a}〜${e}</td>` +
       `<td>${y + a}〜${y + e}</td>` +
       `<td>${ph.name.replace('期', '')}</td>` +
-      `<td>${ph.plant}</td>`;
+      `<td>${ph.moon}</td>`;
     tb.appendChild(tr);
     a = e + 1;
   }
