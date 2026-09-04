@@ -45,6 +45,11 @@
   tr.now td{font-weight:600}
   td.num{text-align:right; color:var(--sub); width:3.2em}
   .note{font-size:.78rem; color:var(--sub); line-height:1.8; margin-top:24px}
+  .lineblock{margin-top:28px; padding:18px 16px; border-top:1px solid #e6ddcd; font-size:.86rem; line-height:1.9}
+  .lineblock .lead{font-weight:600; margin:0 0 8px}
+  .lineblock p{margin:0 0 8px}
+  .lineblock a{color:#8c9b86; font-weight:600}
+  .lineblock .sig{color:var(--sub); font-size:.78rem; margin-top:10px}
   .hidden{display:none}
   @media (prefers-color-scheme:dark){
     :root{--bg:#211d19; --ink:#ece4d8; --sub:#a2968a; --line:#3d362e; --card:#2a251f; --accent:#d9a077}
@@ -106,6 +111,13 @@
       ※ 新月の日付は Swiss Ephemeris で計算した1920〜2045年の実データを使っています。誕生日が新月の当日なら「0」です。<br>
       ※ 年齢は誕生日を迎えたあとの満年齢で数えます。
     </p>
+
+    <div class="lineblock">
+      <p class="lead">🌙 星を、毎日の選び方に活かしたい方へ</p>
+      <p>公式LINEでは、月に一度、12星座それぞれのワンポイントをお届けしています。登録して「〇〇座です」とだけ送っていただくと、あなたの星座に向けたひとことをお返しします。</p>
+      <p><a href="https://lin.ee/9OtxuLz" target="_blank" rel="noopener noreferrer">▼ 公式LINE を見る</a></p>
+      <p class="sig">旅する星と香りのセラピスト・ひろみ</p>
+    </div>
   </div>
 </div>
 
@@ -135,7 +147,7 @@ const PHASES = [
   {lo:11, hi:14, name:'ギバウスムーン期',          moon:'十三夜月（135度・行き）', doing:'最後の調整に入る時期。まわりを見ながら、状況に合わせていきます。ゴールが見えるぶん焦りも出やすいところですが、急がなくても、着実にやれば届きます。'},
   {lo:15, hi:18, name:'フルムーン期',              moon:'満月（180度）', doing:'30年でいちばん満ちるところ。積み上げてきたものが、そのまま成果になります。充実するぶん、勢いも自信もつきます。一歩引いて見ると、受け取ってきたものもよく見えます。'},
   {lo:19, hi:22, name:'ディセミネイティングムーン期',moon:'種まきの月（135度・帰り）', doing:'速さがゆるんで、まわりが見えてくる時期。受け取ってきたものを外へ出していきます。人に伝えることで、自分が何を身につけたのかも見えてきます。'},
-  {lo:23, hi:25, name:'サードクオーター期',        moon:'下弦の月（90度・帰り）', doing:'必要なものと、そうでないものを振り分ける時期。振り返るなかで落ち込むようなことも出てきますが、それは次へ進むための整理です。'},
+  {lo:23, hi:25, name:'サードクオーター期',        moon:'下弦の月（90度・帰り）', doing:'人のために、自分の責任を引き受ける時期。フルムーン期を経てきたぶん、必要なものとそうでないものの判断もつきます。振り返るなかで落ち込むようなことも出てきますが、それは次へ進むための整理です。'},
   {lo:26, hi:29, name:'バルサミックムーン期',      moon:'鎮静の月（45度・帰り）', doing:'内側へ向かう時期。手放して、支度をととのえます。自分にとって大切なものは何か。ここで見えたものが、次のめぐりの始まりになります。'}
 ];
 const phaseOf = n => PHASES.find(p => n >= p.lo && n <= p.hi);
