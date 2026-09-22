@@ -221,11 +221,26 @@ $('go').addEventListener('click', () => {
   }
 
   $('out').classList.remove('hidden');
+  try{if(window.__count)window.__count('calc');}catch(e){}
   $('out').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
 // Enterでも実行
 ['y','m','d'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') $('go').click(); }));
+</script>
+<!-- 利用カウンター（2026-09-23）｜⚠️生年月日などの入力値は送らない。送るのは「開いた」「計算した」という事実だけ。
+     数字の読み方＝ https://abacus.jasoncameron.dev/get/hiromi-lu-2026/open と .../calc をブラウザで開く（開いても増えない）
+     ⚠️計算を止めないため、すべて try/catch で包み、失敗しても何もしない -->
+<script>
+(function(){
+  try{
+    var BASE='https://abacus.jasoncameron.dev/hit/hiromi-lu-2026/';
+    window.__count=function(key){
+      try{ fetch(BASE+key,{cache:'no-store',keepalive:true})['catch'](function(){}); }catch(e){}
+    };
+    window.__count('open');
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
