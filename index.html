@@ -112,6 +112,12 @@
       ※ 年齢は誕生日を迎えたあとの満年齢で数えます。
     </p>
 
+    <!-- ★2026-11-02 Hiromi「もっと知りたい方はセッションへ」＝結果を見た直後の人に1行だけ。⚠️段落を積まない -->
+    <div class="lineblock">
+      <p>この季節に、何を育てて、何を手放していくか。ご自分の星で見てみたい方は、セッションでお話ししています。</p>
+      <p><a href="https://mosh.jp/services/347477" target="_blank" rel="noopener noreferrer" onclick="try{window.__count&&window.__count('session')}catch(e){}">▶ あなたの現在地を知る星読みセッション</a></p>
+    </div>
+
     <div class="lineblock">
       <p class="lead">🌙 星を、毎日の選び方に活かしたい方へ</p>
       <p>公式LINEでは、月に一度、12星座それぞれのワンポイントをお届けしています。登録して「〇〇座です」とだけ送っていただくと、あなたの星座に向けたひとことをお返しします。</p>
@@ -239,6 +245,8 @@ $('go').addEventListener('click', () => {
       try{ fetch(BASE+key,{cache:'no-store',keepalive:true})['catch'](function(){}); }catch(e){}
     };
     window.__count('open');
+    /* ★2026-11-02 LINEのメニューから開いた数＝リンクに ?from=line を付けてある */
+    if(/[?&]from=line/.test(location.search)) window.__count('open-line');
   }catch(e){}
 })();
 </script>
